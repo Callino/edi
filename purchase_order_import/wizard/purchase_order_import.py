@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 import logging
 import mimetypes
 from lxml import etree
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class PurchaseOrderImport(models.TransientModel):
         if not xml_files_dict:
             raise UserError(_(
                 'There are no embedded XML file in this PDF file.'))
-        for xml_filename, xml_root in xml_files_dict.iteritems():
+        for xml_filename, xml_root in xml_files_dict.items():
             logger.info('Trying to parse XML file %s', xml_filename)
             try:
                 parsed_quote = self.parse_xml_quote(xml_root)
@@ -110,7 +111,7 @@ class PurchaseOrderImport(models.TransientModel):
         if 'attachments' not in parsed_quote:
             parsed_quote['attachments'] = {}
         parsed_quote['attachments'][quote_filename] =\
-            quote_file.encode('base64')
+            base64.b64encode(quote_file)
         if 'chatter_msg' not in parsed_quote:
             parsed_quote['chatter_msg'] = []
         return parsed_quote
@@ -167,7 +168,7 @@ class PurchaseOrderImport(models.TransientModel):
             seller=order.partner_id.commercial_partner_id)
 
         update_option = self.update_option
-        for oline, cdict in compare_res['to_update'].iteritems():
+        for oline, cdict in compare_res['to_update'].items():
             write_vals = {}
             if cdict.get('price_unit'):
                 chatter.append(_(
@@ -229,7 +230,7 @@ class PurchaseOrderImport(models.TransientModel):
         if not order:
             raise UserError(_('You must select a quotation to update.'))
         parsed_quote = self.parse_quote(
-            self.quote_file.decode('base64'), self.quote_filename)
+            base64.b64decode(self.quote_file), self.quote_filename)
         currency = bdio._match_currency(
             parsed_quote.get('currency'), parsed_quote['chatter_msg'])
         partner = bdio._match_partner(

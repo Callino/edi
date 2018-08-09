@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # © 2015-2017 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import base64
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_compare, float_round, float_is_zero
@@ -10,7 +10,6 @@ from lxml import etree
 import logging
 from datetime import datetime
 import mimetypes
-import base64
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +25,7 @@ class AccountInvoiceImport(models.TransientModel):
         ('import', 'Import'),
         ('update', 'Update'),
         ('update-from-invoice', 'Update From Invoice'),
-        ], string='State', default="import")
+    ], string='State', default="import")
     partner_id = fields.Many2one(
         'res.partner', string="Supplier", readonly=True)
     currency_id = fields.Many2one(
@@ -34,7 +33,7 @@ class AccountInvoiceImport(models.TransientModel):
     invoice_type = fields.Selection([
         ('in_invoice', 'Invoice'),
         ('in_refund', 'Refund'),
-        ], string="Invoice or Refund", readonly=True)
+    ], string="Invoice or Refund", readonly=True)
     amount_untaxed = fields.Float(
         string='Total Untaxed', digits=dp.get_precision('Account'),
         readonly=True)
@@ -169,10 +168,8 @@ class AccountInvoiceImport(models.TransientModel):
             'currency_id': currency.id,
             'type': parsed_inv['type'],
             'company_id': company.id,
-            'origin': parsed_inv.get('origin'),
             'reference': parsed_inv.get('invoice_number'),
             'date_invoice': parsed_inv.get('date'),
-            'payment_term_id': parsed_inv.get('payment_term_id'),
             'journal_id':
             aio.with_context(type=parsed_inv['type'])._default_journal().id,
             'invoice_line_ids': [],
@@ -204,7 +201,7 @@ class AccountInvoiceImport(models.TransientModel):
                     'account_id': config['account'].id,
                     'invoice_line_tax_ids': invoice_line_tax_ids,
                     'price_unit': parsed_inv.get('amount_untaxed'),
-                    }
+                }
             elif config['invoice_line_method'] == '1line_static_product':
                 product = config['product']
                 il_vals = {'product_id': product.id, 'invoice_id': vals}
@@ -228,7 +225,7 @@ class AccountInvoiceImport(models.TransientModel):
             if config['invoice_line_method'] == 'nline_no_product':
                 static_vals = {
                     'account_id': config['account'].id,
-                    }
+                }
             elif config['invoice_line_method'] == 'nline_static_product':
                 sproduct = config['product']
                 static_vals = {'product_id': sproduct.id, 'invoice_id': vals}
@@ -264,7 +261,7 @@ class AccountInvoiceImport(models.TransientModel):
                 il_vals.update({
                     'quantity': line['qty'],
                     'price_unit': line['price_unit'],  # TODO fix for tax incl
-                    })
+                })
                 vals['invoice_line_ids'].append((0, 0, il_vals))
         # Write analytic account + fix syntax for taxes
         aacount_id = config.get('account_analytic') and\
@@ -412,7 +409,7 @@ class AccountInvoiceImport(models.TransientModel):
             'currency_id': currency.id,
             'amount_untaxed': parsed_inv['amount_untaxed'],
             'amount_total': parsed_inv['amount_total'],
-            })
+        })
         if not partner.invoice_import_id:
             raise UserError(_(
                 "Missing Invoice Import Configuration on partner '%s'.")
@@ -470,7 +467,7 @@ class AccountInvoiceImport(models.TransientModel):
             'view_mode': 'form,tree,calendar,graph',
             'views': False,
             'res_id': invoice.id,
-            })
+        })
         return action
 
     @api.model
@@ -496,7 +493,7 @@ class AccountInvoiceImport(models.TransientModel):
             'name': _('Adjustment'),
             'quantity': 1,
             'price_unit': diff_amount,
-            }
+        }
         # no taxes nor product on such a global adjustment line
         if import_config['invoice_line_method'] == 'nline_no_product':
             il_vals['account_id'] = import_config['account'].id
@@ -557,7 +554,7 @@ class AccountInvoiceImport(models.TransientModel):
                         'name': _('Adjustment on %s') % iline.name,
                         'quantity': 1,
                         'price_unit': diff_amount,
-                        }
+                    }
                     if import_config['invoice_line_method'] ==\
                             'nline_auto_product':
                         copy_dict['product_id'] = False
@@ -623,7 +620,7 @@ class AccountInvoiceImport(models.TransientModel):
                 'uom': eline.uom_id,
                 'line': eline,
                 'price_unit': price_unit,
-                })
+            })
         compare_res = self.env['business.document.import'].compare_lines(
             existing_lines, parsed_inv['lines'], chatter, seller=seller)
         for eline, cdict in compare_res['to_update'].items():
@@ -687,7 +684,7 @@ class AccountInvoiceImport(models.TransientModel):
             'price_unit': import_line.get('price_unit'),
             'quantity': import_line['qty'],
             'invoice_id': invoice.id,
-            })
+        })
         return vals
 
     @api.model
@@ -771,7 +768,7 @@ class AccountInvoiceImport(models.TransientModel):
             'view_mode': 'form,tree,calendar,graph',
             'views': False,
             'res_id': invoice.id,
-            })
+        })
         return action
 
     def xpath_to_dict_helper(self, xml_root, xpath_dict, namespaces):

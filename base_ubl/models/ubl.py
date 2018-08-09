@@ -521,6 +521,8 @@ class BaseUbl(models.AbstractModel):
         (used for py3o reports, *_ubl_py3o modules in this repo)
         """
         assert pdf_content or pdf_file, 'Missing pdf_file or pdf_content'
+        if isinstance(pdf_content, list):
+            pdf_content = pdf_content[0]
         logger.debug('Starting to embed %s in PDF file', xml_filename)
         if pdf_file:
             original_pdf_file = pdf_file

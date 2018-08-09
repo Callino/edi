@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # © 2016-2017 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -156,11 +155,6 @@ class AccountInvoiceImport(models.TransientModel):
             if inv_type_code == '381':
                 inv_type = 'in_refund'
         inv_number_xpath = xml_root.xpath('//cbc:ID', namespaces=namespaces)
-        ord_number_xpath = xml_root.xpath('//cac:OrderReference/cbc:ID',
-                                          namespaces=namespaces)
-        origin = False
-        if ord_number_xpath:
-            origin = ord_number_xpath[0].text
         supplier_xpath = xml_root.xpath(
             '/inv:Invoice/cac:AccountingSupplierParty',
             namespaces=namespaces)
@@ -237,7 +231,6 @@ class AccountInvoiceImport(models.TransientModel):
             'type': inv_type,
             'partner': supplier_dict,
             'invoice_number': inv_number_xpath[0].text,
-            'origin': origin,
             'date': fields.Date.to_string(date_dt),
             'date_due': date_due_str,
             'currency': {'iso': currency_iso_xpath[0].text},

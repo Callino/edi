@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # © 2015-2017 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -21,7 +20,7 @@ class AccountInvoiceImportConfig(models.Model):
         ('nline_no_product', 'Multi Line, No Product'),
         ('nline_static_product', 'Multi Line, Static Product'),
         ('nline_auto_product', 'Multi Line, Auto-selected Product'),
-        ], string='Method for Invoice Line', required=True,
+    ], string='Method for Invoice Line', required=True,
         default='1line_no_product',
         help="The multi-line methods will not work for PDF invoices "
         "that don't have an embedded XML file. "

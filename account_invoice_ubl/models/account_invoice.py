@@ -53,7 +53,7 @@ class AccountInvoice(models.Model):
             self, parent_node, ns, version='2.1'):
         self.ensure_one()
         cdr_dict = self._ubl_get_contract_document_reference_dict()
-        for doc_type_code, doc_id in cdr_dict.iteritems():
+        for doc_type_code, doc_id in cdr_dict.items():
             cdr = etree.SubElement(
                 parent_node, ns['cac'] + 'ContractDocumentReference')
             cdr_id = etree.SubElement(cdr, ns['cbc'] + 'ID')
@@ -78,7 +78,7 @@ class AccountInvoice(models.Model):
                 mimeCode="application/pdf")
             ctx = self._context.copy()
             ctx['no_embedded_ubl_xml'] = True
-            pdf_inv = self.pool['report'].get_pdf(
+            pdf_inv = self.env['ir.actions.report'].get_pdf(
                 self._cr, self._uid, [self.id], 'account.report_invoice',
                 context=ctx)
             binary_node.text = pdf_inv.encode('base64')

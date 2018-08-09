@@ -146,7 +146,7 @@ class TestFacturx(TransactionCase):
         # in order to import ZUGFeRD_1p0_EXTENDED_Kostenrechnung.pdf
         price_precision = self.env.ref('product.decimal_price')
         price_precision.digits = 4
-        for (inv_file, res_dict) in sample_files.iteritems():
+        for (inv_file, res_dict) in sample_files.items():
             f = file_open(
                 'account_invoice_import_factur-x/tests/files/' +
                 inv_file, 'rb')

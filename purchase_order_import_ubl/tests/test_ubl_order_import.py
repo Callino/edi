@@ -17,7 +17,7 @@ class TestUblOrderImport(TransactionCase):
                 },
             }
         poio = self.env['purchase.order.import']
-        for filename, res in tests.iteritems():
+        for filename, res in tests.items():
             po = res['po_to_update']
 
             f = file_open(

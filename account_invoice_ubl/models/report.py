@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Report(models.Model):
-    _inherit = 'report'
+    _inherit = 'ir.actions.report'
 
     @api.model
     def get_pdf(self, docids, report_name, html=None, data=None):

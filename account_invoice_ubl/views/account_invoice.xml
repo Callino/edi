@@ -12,7 +12,7 @@
     <field name="model">account.invoice</field>
     <field name="inherit_id" ref="account.invoice_form"/>
     <field name="arch" type="xml">
-        <button name="action_invoice_cancel" position="before">
+        <button name="action_invoice_open" position="before">
             <button type="object" name="attach_ubl_xml_file_button"
                 string="Generate UBL XML File" states="open,paid"/>
         </button>

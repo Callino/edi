@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # © 2015-2017 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, _
 from odoo.exceptions import UserError
@@ -24,7 +23,7 @@ class ResPartner(models.Model):
         vals = {
             'invoice_line_method': config.invoice_line_method,
             'account_analytic': config.account_analytic_id or False,
-            }
+        }
         if config.invoice_line_method == '1line_no_product':
             vals['account'] = config.account_id
             vals['taxes'] = config.tax_ids
