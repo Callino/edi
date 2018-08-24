@@ -57,6 +57,8 @@ class PurchaseOrderImport(models.TransientModel):
         ns['main'] = main_xmlns
         date_xpath = xml_root.xpath(
             '/main:Quotation/cbc:IssueDate', namespaces=ns)
+        order_ref_xpath = xml_root.xpath(
+            '/main:Quotation/cac:RequestForQuotationDocumentReference/cbc:ID', namespaces=ns)
         currency_xpath = xml_root.xpath(
             '/main:Quotation/cbc:PricingCurrencyCode', namespaces=ns)
         currency_code = False
@@ -89,6 +91,7 @@ class PurchaseOrderImport(models.TransientModel):
             'currency': {'iso': currency_code},
             'date': date_xpath[0].text,
             'incoterm': incoterm_dict,
+            'order_ref': order_ref_xpath[0].text,
             'note': note_xpath and note_xpath[0].text or False,
             'lines': res_lines,
         }

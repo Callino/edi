@@ -6,6 +6,7 @@ from odoo import models
 from lxml import etree
 from odoo.tools import float_is_zero, float_round
 import logging
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ class AccountInvoice(models.Model):
             pdf_inv = self.env['ir.actions.report'].get_pdf(
                 self._cr, self._uid, [self.id], 'account.report_invoice',
                 context=ctx)
-            binary_node.text = pdf_inv.encode('base64')
+            binary_node.text = base64.b64encode(pdf_inv)
 
     def _ubl_add_legal_monetary_total(self, parent_node, ns, version='2.1'):
         monetary_total = etree.SubElement(
@@ -120,7 +121,7 @@ class AccountInvoice(models.Model):
         price_precision = dpo.precision_get('Product Price')
         account_precision = self.currency_id.decimal_places
         line_id = etree.SubElement(line_root, ns['cbc'] + 'ID')
-        line_id.text = unicode(line_number)
+        line_id.text = str(line_number)
         uom_unece_code = False
         # uom_id is not a required field on account.invoice.line
         if iline.uom_id and iline.uom_id.unece_code:
@@ -216,12 +217,9 @@ class AccountInvoice(models.Model):
         # the field 'partner_shipping_id' is defined in the 'sale' module
         if hasattr(self, 'partner_shipping_id') and self.partner_shipping_id:
             self._ubl_add_delivery(self.partner_shipping_id, xml_root, ns)
-        # Put paymentmeans block even when invoice is paid ?
-        payment_identifier = self.get_payment_identifier()
         self._ubl_add_payment_means(
             self.partner_bank_id, self.payment_mode_id, self.date_due,
-            xml_root, ns, payment_identifier=payment_identifier,
-            version=version)
+            xml_root, ns, version=version)
         if self.payment_term_id:
             self._ubl_add_payment_terms(
                 self.payment_term_id, xml_root, ns, version=version)
@@ -293,8 +291,8 @@ class AccountInvoice(models.Model):
         attach = self.env['ir.attachment'].create({
             'name': filename,
             'res_id': self.id,
-            'res_model': unicode(self._name),
-            'datas': xml_string.encode('base64'),
+            'res_model': str(self._name),
+            'datas': base64.b64encode(xml_string),
             'datas_fname': filename,
             # I have default_type = 'out_invoice' in context, so 'type'
             # would take 'out_invoice' value by default !

@@ -120,6 +120,7 @@ class SaleOrderImport(models.TransientModel):
             'currency': {'iso': currency_code},
             'date': date_xpath[0].text,
             'order_ref': order_ref_xpath[0].text,
+            'client_order_ref': order_ref_xpath[0].text,
             'incoterm': incoterm_dict,
             'note': note_xpath and note_xpath[0].text or False,
             'lines': res_lines,

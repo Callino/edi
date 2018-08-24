@@ -281,7 +281,8 @@ class SaleOrderImport(models.TransientModel):
                 parsed_order['ship_to'], partner, []).id
         existing_quotations = self.env['sale.order'].search([
             ('commercial_partner_id', '=', commercial_partner.id),
-            ('state', 'in', ('draft', 'sent'))])
+            ('state', 'in', ('draft', 'sent')),
+            ('client_order_ref', '=', parsed_order['client_order_ref'])])
         if existing_quotations:
             default_sale_id = False
             if len(existing_quotations) == 1:

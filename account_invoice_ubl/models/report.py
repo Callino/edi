@@ -8,28 +8,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Report(models.Model):
+class IrActionsReport(models.Model):
     _inherit = 'ir.actions.report'
 
     @api.model
-    def get_pdf(self, docids, report_name, html=None, data=None):
+    def render_qweb_pdf(self, res_ids=None, data=None):
         """We go through that method when the PDF is generated for the 1st
         time and also when it is read from the attachment.
         This method is specific to QWeb"""
-        pdf_content = super(Report, self).get_pdf(
-            docids, report_name, html=html, data=data)
+        pdf_content = super(IrActionsReport, self).render_qweb_pdf(
+            res_ids, data)
         invoice_reports = [
             'account.report_invoice',
             'account.account_invoice_report_duplicate_main']
         if (
-                report_name in invoice_reports and
-                len(docids) == 1 and
+                len(self) == 1 and
+                self.report_name in invoice_reports and
+                len(res_ids) == 1 and
                 not self._context.get('no_embedded_ubl_xml')):
-            invoice = self.env['account.invoice'].browse(docids[0])
-            if (
-                    invoice.type in ('out_invoice', 'out_refund') and
-                    invoice.company_id.xml_format_in_pdf_invoice == 'ubl'):
-                pdf_content = invoice.with_context(
-                    no_embedded_pdf=True).embed_ubl_xml_in_pdf(
-                    pdf_content=pdf_content)
+            invoice = self.env['account.invoice'].browse(res_ids[0])
+            pdf_content = invoice.embed_ubl_xml_in_pdf(pdf_content=pdf_content)
         return pdf_content

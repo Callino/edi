@@ -42,6 +42,11 @@ class SaleOrder(models.Model):
             doc_currency = etree.SubElement(
                 parent_node, ns['cbc'] + 'PricingCurrencyCode')
             doc_currency.text = self.currency_id.name
+            order_reference = etree.SubElement(
+                parent_node, ns['cac'] + 'RequestForQuotationDocumentReference')
+            order_reference_id = etree.SubElement(
+                order_reference, ns['cbc'] + 'ID')
+            order_reference_id.text = self.client_order_ref or 'Missing'
 
     @api.multi
     def _ubl_add_quoted_monetary_total(self, parent_node, ns, version='2.1'):
@@ -90,6 +95,7 @@ class SaleOrder(models.Model):
             self._ubl_add_customer_party(
                 self.partner_id, False, 'BuyerCustomerParty', xml_root, ns,
                 version=version)
+
         self._ubl_add_delivery(
             self.partner_shipping_id, xml_root, ns, version=version)
         if hasattr(self, 'incoterm') and self.incoterm:
