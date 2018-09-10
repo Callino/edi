@@ -9,7 +9,7 @@
     'summary': 'Import UBL XML sale order files',
     'author': 'Akretion,Odoo Community Association (OCA)',
     'website': 'https://github.com/oca/edi',
-    'depends': ['sale_order_import', 'base_ubl'],
+    'depends': ['sale_order_import', 'base_ubl', 'sales_team'],
     'demo': ['demo/demo_data.xml'],
     'installable': True,
 }

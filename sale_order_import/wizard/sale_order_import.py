@@ -8,6 +8,7 @@ import logging
 import mimetypes
 from lxml import etree
 from base64 import b64decode, b64encode
+from odoo.addons.base_business_document_import.exceptions import WrongTypeError
 
 logger = logging.getLogger(__name__)
 
@@ -87,14 +88,14 @@ class SaleOrderImport(models.TransientModel):
 
     @api.model
     def parse_xml_order(self, xml_root, detect_doc_type=False):
-        raise UserError(_(
+        raise WrongTypeError(_(
             "This type of XML RFQ/order is not supported. Did you install "
             "the module to support this XML format?"))
 
     @api.model
     def parse_csv_order(self, order_file, partner):
         assert partner, 'missing partner'
-        raise UserError(_(
+        raise WrongTypeError(_(
             "This type of CSV order is not supported. Did you install "
             "the module to support CSV orders?"))
 
@@ -105,7 +106,7 @@ class SaleOrderImport(models.TransientModel):
         """
         xml_files_dict = self.get_xml_files_from_pdf(order_file)
         if not xml_files_dict:
-            raise UserError(_(
+            raise WrongTypeError(_(
                 'There are no embedded XML file in this PDF file.'))
         for xml_filename, xml_root in xml_files_dict.items():
             logger.info('Trying to parse XML file %s', xml_filename)
@@ -115,7 +116,7 @@ class SaleOrderImport(models.TransientModel):
                 return parsed_order
             except:
                 continue
-        raise UserError(_(
+        raise WrongTypeError(_(
             "This type of XML RFQ/order is not supported. Did you install "
             "the module to support this XML format?"))
 
@@ -250,7 +251,7 @@ class SaleOrderImport(models.TransientModel):
         elif filetype == 'application/pdf':
             parsed_order = self.parse_pdf_order(order_file)
         else:
-            raise UserError(_(
+            raise WrongTypeError(_(
                 "This file '%s' is not recognised as a CSV, XML nor PDF file. "
                 "Please check the file and it's extension.") % order_filename)
         logger.debug('Result of order parsing: %s', parsed_order)

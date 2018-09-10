@@ -9,6 +9,7 @@ import logging
 import mimetypes
 from lxml import etree
 import base64
+from odoo.addons.base_business_document_import.exceptions import WrongTypeError
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class PurchaseOrderImport(models.TransientModel):
 
     @api.model
     def parse_xml_quote(self, xml_root):
-        raise UserError(_(
+        raise WrongTypeError(_(
             "This type of XML quotation is not supported. Did you install "
             "the module to support this XML format?"))
 
@@ -50,7 +51,7 @@ class PurchaseOrderImport(models.TransientModel):
         """
         xml_files_dict = self.get_xml_files_from_pdf(quote_file)
         if not xml_files_dict:
-            raise UserError(_(
+            raise WrongTypeError(_(
                 'There are no embedded XML file in this PDF file.'))
         for xml_filename, xml_root in xml_files_dict.items():
             logger.info('Trying to parse XML file %s', xml_filename)
@@ -59,7 +60,7 @@ class PurchaseOrderImport(models.TransientModel):
                 return parsed_quote
             except:
                 continue
-        raise UserError(_(
+        raise WrongTypeError(_(
             "This type of XML quotation is not supported. Did you install "
             "the module to support this XML format?"))
 
@@ -94,7 +95,7 @@ class PurchaseOrderImport(models.TransientModel):
             try:
                 xml_root = etree.fromstring(quote_file)
             except:
-                raise UserError(_("This XML file is not XML-compliant"))
+                raise WrongTypeError(_("This XML file is not XML-compliant"))
             pretty_xml_string = etree.tostring(
                 xml_root, pretty_print=True, encoding='UTF-8',
                 xml_declaration=True)
@@ -104,7 +105,7 @@ class PurchaseOrderImport(models.TransientModel):
         elif filetype == 'application/pdf':
             parsed_quote = self.parse_pdf_quote(quote_file)
         else:
-            raise UserError(_(
+            raise WrongTypeError(_(
                 "This file '%s' is not recognised as XML nor PDF file. "
                 "Please check the file and it's extension.") % quote_filename)
         logger.debug('Result of quotation parsing: %s', parsed_quote)
