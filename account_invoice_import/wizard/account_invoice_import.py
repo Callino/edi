@@ -10,6 +10,7 @@ from lxml import etree
 import logging
 from datetime import datetime
 import mimetypes
+from odoo.addons.base_business_document_import.exceptions import WrongTypeError
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class AccountInvoiceImport(models.TransientModel):
                 return parsed_inv
         parsed_inv = self.fallback_parse_pdf_invoice(file_data)
         if not parsed_inv:
-            raise UserError(_(
+            raise WrongTypeError(_(
                 "This type of PDF invoice is not supported. Did you install "
                 "the module to support this type of file?"))
         return parsed_inv
@@ -318,7 +319,7 @@ class AccountInvoiceImport(models.TransientModel):
             try:
                 xml_root = etree.fromstring(file_data)
             except Exception as e:
-                raise UserError(_(
+                raise WrongTypeError(_(
                     "This XML file is not XML-compliant. Error: %s") % e)
             pretty_xml_string = etree.tostring(
                 xml_root, pretty_print=True, encoding='UTF-8',
@@ -327,7 +328,7 @@ class AccountInvoiceImport(models.TransientModel):
             logger.debug(pretty_xml_string)
             parsed_inv = self.parse_xml_invoice(xml_root)
             if parsed_inv is False:
-                raise UserError(_(
+                raise WrongTypeError(_(
                     "This type of XML invoice is not supported. "
                     "Did you install the module to support this type "
                     "of file?"))
