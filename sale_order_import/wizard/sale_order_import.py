@@ -447,6 +447,8 @@ class SaleOrderImport(models.TransientModel):
         order = self.sale_id
         if not order:
             raise UserError(_('You must select a quotation to update.'))
+        if order.state not in ['draft', 'sent']:
+            raise UserError(_('You can not update a confirmed order.'))
         parsed_order = self.parse_order(
             b64decode(self.order_file), self.order_filename,
             self.partner_id)
@@ -469,8 +471,17 @@ class SaleOrderImport(models.TransientModel):
         order.message_post(_(
             "This quotation has been updated automatically via the import of "
             "file %s") % self.order_filename)
-        action = self.env['ir.actions.act_window'].for_xml_id(
-            'sale', 'action_quotations')
+        if 'doc_type' in parsed_order and parsed_order['doc_type'] == 'order':
+            # Customer did accepted the order - so we do confirm here
+            order.action_confirm()
+            order.message_post(_(
+                "This quotation has been automatically confirmed via the import of "
+                "file %s") % self.order_filename)
+            action = self.env['ir.actions.act_window'].for_xml_id(
+                'sale', 'action_orders')
+        else:
+            action = self.env['ir.actions.act_window'].for_xml_id(
+                'sale', 'action_quotations')
         action.update({
             'view_mode': 'form,tree,calendar,graph',
             'views': False,
