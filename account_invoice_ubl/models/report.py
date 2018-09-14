@@ -20,7 +20,9 @@ class IrActionsReport(models.Model):
             res_ids, data)
         invoice_reports = [
             'account.report_invoice',
-            'account.account_invoice_report_duplicate_main']
+            'account.account_invoice_report_duplicate_main',
+            'account.report_invoice_with_payments'
+        ]
         if (
                 len(self) == 1 and
                 self.report_name in invoice_reports and
